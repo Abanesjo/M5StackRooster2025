@@ -1,14 +1,19 @@
 #include <M5Core2.h>
 
+#define THRESHOLD 2
+
+float posX = 0.0f;
+float posY = 0.0f;
+float posZ = 0.0f;
+
 double screenHeight, screenWidth;
 int selectMode;
 int xCursor, yCursor;
 String placeHolderTime;
 
-void setup() 
-{
+void setup() {
   M5.begin();
-  M5.Lcd.begin();
+  M5.IMU.Init();
   M5.Lcd.fillScreen(BLACK);
   screenHeight = M5.Lcd.height();
   screenWidth = M5.Lcd.width();
@@ -18,13 +23,29 @@ void setup()
   M5.Lcd.setTextColor(BLACK, LIGHTGREY);
 }
 
-
-void loop() 
-{
+void loop() {
   homeScreenLayout();
-  delay(200);
+  delay(150);
 }
 
+bool detectMovement() {
+  bool result;
+  float oldX = posX;
+  float oldY = posY;
+  float oldZ = posZ;
+  float newX, newY, newZ;
+  M5.IMU.getAhrsData(&newX, &newY, &newZ);
+
+  posX = newX;
+  posY = newY;
+  posZ = newZ;
+
+  if (abs(newX - oldX) >  THRESHOLD || abs(newY - oldY) > THRESHOLD || abs(newZ - oldZ) > THRESHOLD) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 void homeScreenLayout()
 {                 //Starts        Initial      step         height
