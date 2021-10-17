@@ -1,42 +1,43 @@
 #include <M5Core2.h>
 
-double screenHeight, screenWidth;
-int selectMode;
-int xCursor, yCursor;
-String placeHolderTime;
+#define THRESHOLD 2
 
-void setup() 
-{
+float posX = 0.0f;
+float posY = 0.0f;
+float posZ = 0.0f;
+
+void setup() {
   M5.begin();
-  M5.Lcd.begin();
-  M5.Lcd.fillScreen(BLACK);
-  screenHeight = M5.Lcd.height();
-  screenWidth = M5.Lcd.width();
-  xCursor = M5.Lcd.getCursorX();
-  yCursor = M5.Lcd.getCursorY();
-  M5.Lcd.setTextSize(7);
-  M5.Lcd.setTextColor(BLACK, LIGHTGREY);
+  M5.IMU.Init();
+  M5.Lcd.fillScreen(GREEN);
+  M5.Lcd.setTextSize(2);
 }
 
+void loop() {
 
-void loop() 
-{
-  homeScreenLayout();
-  delay(200);
+  if (detectMovement()) {
+    M5.Lcd.fillRect(100, 100, 120, 80, RED);
+  } else {
+    M5.Lcd.fillRect(100, 100, 120, 80, GREEN);
+  }
+  delay(100);
 }
 
+bool detectMovement() {
+  bool result;
+  float oldX = posX;
+  float oldY = posY;
+  float oldZ = posZ;
+  float newX, newY, newZ;
+  M5.IMU.getAhrsData(&newX, &newY, &newZ);
 
-void homeScreenLayout()
-{                 //Starts        Initial      step         height
-  M5.Lcd.fillRect(0.1*screenWidth, 0.125*screenHeight, 0.8*screenWidth, 0.35 * screenHeight, LIGHTGREY);
-  
-  while (true) {
-    
-    M5.Lcd.setCursor(0.175 * screenWidth, 0.19 * screenHeight);
-    placeHolderTime = "10:49";
+  posX = newX;
+  posY = newY;
+  posZ = newZ;
 
-    //Printing the Time
-    M5.Lcd.print(placeHolderTime);
-    //break function if touch screen detected
+  if (abs(newX - oldX) >  THRESHOLD || abs(newY - oldY) > THRESHOLD || abs(newZ - oldZ) > THRESHOLD) {
+    return true;
+  } else {
+    return false;
   }
 }
