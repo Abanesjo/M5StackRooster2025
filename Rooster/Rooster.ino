@@ -3,12 +3,11 @@
 #define THRESHOLD 2
 
 double screenHeight,screenWidth;
-int selectMode;
 int xCursor, yCursor;
 
-float posX = 0.0f;
-float posY = 0.0f;
-float posZ = 0.0f;
+float pitch = 0.0f;
+float roll = 0.0f;
+float yaw = 0.0f;
 
 RTC_TimeTypeDef RTCtime;
 
@@ -42,17 +41,17 @@ void setTime(){
 
 bool detectMovement(){
   bool result;
-  float oldX = posX;
-  float oldY = posY;
-  float oldZ = posZ;
-  float newX, newY, newZ;
-  M5.IMU.getAhrsData(&newX, &newY, &newZ);
+  float oldPitch = pitch;
+  float oldRoll = roll;
+  float oldYaw = yaw;
+  float newPitch, newRoll, newYaw;
+  M5.IMU.getAhrsData(&newPitch, &newRoll, &newYaw);
 
-  posX = newX;
-  posY = newY;
-  posZ = newZ;
+  pitch = newPitch;
+  roll = newRoll;
+  yaw = newYaw;
 
-  if (abs(newX-oldX) > THRESHOLD || abs(newY-oldY) > THRESHOLD || abs(newZ - oldZ) > THRESHOLD) {
+  if (abs(newPitch - oldPitch) > THRESHOLD || abs(newRoll - oldRoll) > THRESHOLD || abs(newYaw - oldYaw) > THRESHOLD) {
     return true;
   }
   else {
@@ -88,22 +87,16 @@ void homeScreenLayout(){
   else{
     M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, GREEN);
   }
-  /*M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, GREEN);
-  if (){
-    M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, RED);*/
 
    M5.Lcd.setCursor(0.13 * screenWidth, 0.2 * screenHeight);
 
    //Printing the Time
    M5.Rtc.GetTime(&RTCtime);
-//     sprintf(timeStrbuff,"%02d:%02d:%02d",RTCtime.Hours,RTCtime.Minutes,RTCtime.Seconds);
-//     M5.Lcd.println(timeStrbuff);
    int alarmTime = toSeconds(8, 0, 0);
    int currentTime = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
    timeStrbuff = formatTime(alarmTime - currentTime);
 
    M5.Lcd.println(timeStrbuff);
-   //break function if touch screen detected
 }
 
 int toSeconds(int hours, int minutes, int seconds) {
@@ -121,4 +114,3 @@ String formatTime(int sec) {
   output = String(hours) + ":" + String(minutes) + ":" + String(seconds);
   return output;
 }
-
