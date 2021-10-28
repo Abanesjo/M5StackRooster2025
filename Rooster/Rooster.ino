@@ -69,15 +69,6 @@ bool maxTimeReached(int hours, int minutes, int seconds){
   }
 }
 
-bool alarm(bool condition1, bool condition2){
-  if (condition1 == 1 || condition2 == 1){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
 void homeScreenLayout(){
   M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, LIGHTGREY);
   //TEST ALARM INDICATOR
