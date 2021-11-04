@@ -102,6 +102,30 @@ String formatTime(int sec) {
   sec -= 60 * minutes;
   int seconds = sec;
   String output;
-  output = String(hours) + ":" + String(minutes) + ":" + String(seconds);
+  if(hours<10 && minutes<10 && seconds<10){
+    output = "0" + String(hours) + ":" + "0" + String(minutes) + ":" + "0" + String(seconds);
+  }
+  //minutes and hours, hours and seconds, minutes and seconds
+  else if(hours<10 && minutes<10 && seconds>10){
+    output = "0" + String(hours) + ":" + "0" + String(minutes) + ":" + String(seconds);
+  }
+  else if(hours<10 && minutes>10 && seconds<10){
+    output = "0" + String(hours) + ":" + String(minutes) + ":" + "0" + String(seconds);
+  }
+  else if(hours>10 && minutes<10 && seconds<10){
+    output = String(hours) + ":" + "0" + String(minutes) + ":" + "0" + String(seconds);
+  }
+  else if(hours<10 && minutes>10 && seconds>10){
+    output = "0" + String(hours) + ":" + String(minutes) + ":" + String(seconds);
+  }
+  else if(hours>10 && minutes<10 && seconds>10){
+    output = String(hours) + ":" + "0" + String(minutes) + ":" + String(seconds);
+  }
+   else if(hours>10 && minutes>10 && seconds<10){
+    output = "0" + String(hours) + ":" + String(minutes) + ":" + "0" + String(seconds);
+  }
+  else{
+    output = String(hours) + ":" + String(minutes) + ":" + String(seconds);
+  }
   return output;
 }
