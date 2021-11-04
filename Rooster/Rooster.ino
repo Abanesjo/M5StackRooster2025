@@ -105,7 +105,6 @@ String formatTime(int sec) {
   if(hours<10 && minutes<10 && seconds<10){
     output = "0" + String(hours) + ":" + "0" + String(minutes) + ":" + "0" + String(seconds);
   }
-  //minutes and hours, hours and seconds, minutes and seconds
   else if(hours<10 && minutes<10 && seconds>10){
     output = "0" + String(hours) + ":" + "0" + String(minutes) + ":" + String(seconds);
   }
