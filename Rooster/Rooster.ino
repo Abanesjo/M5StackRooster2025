@@ -29,6 +29,7 @@ void setup(){
 
 void loop(){
   homeScreenLayout();
+  vibration();
   delay(150);  
 }
 
@@ -127,4 +128,15 @@ String formatTime(int sec) {
     output = String(hours) + ":" + String(minutes) + ":" + String(seconds);
   }
   return output;
+}
+
+void vibration(){
+  if (detectMovement()){
+    M5.Axp.SetLDOEnable(3,true);   //Open the vibration.   开启震动马达
+    delay(100);
+  }
+  else{
+    M5.Axp.SetLDOEnable(3,false);
+    data_offset = 0;  
+  }
 }
