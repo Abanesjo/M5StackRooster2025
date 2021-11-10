@@ -102,41 +102,27 @@ String formatTime(int sec) {
   int minutes = sec/60;
   sec -= 60 * minutes;
   int seconds = sec;
-  String output;
-  if(hours<10 && minutes<10 && seconds<10){
-    output = "0" + String(hours) + ":" + "0" + String(minutes) + ":" + "0" + String(seconds);
+  String hourVal = String(hours);
+  String minVal = String(minutes)
+  String secVal = Stirng(seconds);
+  if(hours<10){
+    hourVal = "0" + hourVal;
   }
-  else if(hours<10 && minutes<10 && seconds>10){
-    output = "0" + String(hours) + ":" + "0" + String(minutes) + ":" + String(seconds);
+  if(minutes<10){
+    minVal = "0" + minVal;
   }
-  else if(hours<10 && minutes>10 && seconds<10){
-    output = "0" + String(hours) + ":" + String(minutes) + ":" + "0" + String(seconds);
+  if(seconds<10){
+    secVal = "0" + secVal;
   }
-  else if(hours>10 && minutes<10 && seconds<10){
-    output = String(hours) + ":" + "0" + String(minutes) + ":" + "0" + String(seconds);
-  }
-  else if(hours<10 && minutes>10 && seconds>10){
-    output = "0" + String(hours) + ":" + String(minutes) + ":" + String(seconds);
-  }
-  else if(hours>10 && minutes<10 && seconds>10){
-    output = String(hours) + ":" + "0" + String(minutes) + ":" + String(seconds);
-  }
-   else if(hours>10 && minutes>10 && seconds<10){
-    output = "0" + String(hours) + ":" + String(minutes) + ":" + "0" + String(seconds);
-  }
-  else{
-    output = String(hours) + ":" + String(minutes) + ":" + String(seconds);
-  }
+  String output = hourVal + ":" + minVal + ":" + secVal;
   return output;
-}
 
-void vibration(){
+void vibrationFeedback(){
   if (detectMovement()){
-    M5.Axp.SetLDOEnable(3,true);   //Open the vibration.   开启震动马达
-    delay(100);
+    M5.Axp.SetLDOEnable(3,true);  
+    delay(50);
   }
   else{
-    M5.Axp.SetLDOEnable(3,false);
-    data_offset = 0;  
+    M5.Axp.SetLDOEnable(3,false);  
   }
 }
