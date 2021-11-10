@@ -29,7 +29,7 @@ void setup(){
 
 void loop(){
   homeScreenLayout();
-  vibration();
+  vibrationFeedback();
   delay(150);  
 }
 
@@ -125,4 +125,11 @@ void vibrationFeedback(){
   else{
     M5.Axp.SetLDOEnable(3,false);  
   }
+}
+  
+void vibrationAlarm(){
+  M5.Axp.SetLDOEnable(3,true);  
+  delay(100);
+  M5.Axp.SetLDOEnable(3,false);  
+  delay(10);
 }
