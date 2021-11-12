@@ -103,8 +103,8 @@ String formatTime(int sec) {
   sec -= 60 * minutes;
   int seconds = sec;
   String hourVal = String(hours);
-  String minVal = String(minutes)
-  String secVal = Stirng(seconds);
+  String minVal = String(minutes);
+  String secVal = String(seconds);
   if(hours<10){
     hourVal = "0" + hourVal;
   }
@@ -116,6 +116,7 @@ String formatTime(int sec) {
   }
   String output = hourVal + ":" + minVal + ":" + secVal;
   return output;
+}
 
 void vibrationFeedback(){
   if (detectMovement()){
