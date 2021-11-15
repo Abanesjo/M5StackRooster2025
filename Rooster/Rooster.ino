@@ -2,6 +2,11 @@
 
 #define THRESHOLD 2
 
+struct customPoint {
+  double x;
+  double y;
+};
+
 double screenHeight,screenWidth;
 int xCursor, yCursor;
 
@@ -115,4 +120,26 @@ String formatTime(int sec) {
   }
   String output = hourVal + ":" + minVal + ":" + secVal;
   return output;
+}
+
+// if not declaring a customPoint object, you can use distance({x1, y1}, {x2, y2})
+double distance (customPoint p1, customPoint p2)
+{
+  return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+}
+
+bool isPressed(customPoint center, double radius) {
+  TouchPoint_t coordinate = M5.Touch.getPressPoint();
+  M5.Lcd.setCursor(30, 30);
+  M5.Lcd.printf("x:%d, y:%d \r\n", coordinate.x, coordinate.y);
+
+  customPoint pressPoint = {coordinate.x, coordinate.y};
+
+  if (distance(pressPoint, center) > radius)
+  {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
