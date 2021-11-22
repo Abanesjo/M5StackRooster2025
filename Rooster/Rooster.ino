@@ -143,3 +143,128 @@ bool isPressed(customPoint center, double radius) {
     return true;
   }
 }
+
+
+void secondScreenlayout()
+{ 
+  //setup function
+//   M5.Lcd.setTextSize(2.4);
+//   M5.Lcd.setTextColor(WHITE, BLACK);
+  //4 boxes for setting the alarm 
+                        //Starts            Initial                 step         height
+  M5.Lcd.fillRect(0.55*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //1st Rect
+  M5.Lcd.fillRect(0.80*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //2nd Rect
+  M5.Lcd.fillRect(0.55*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //3rd Rect
+  M5.Lcd.fillRect(0.80*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //4th rect
+
+  // + and - symbols in those boxes
+
+  //1st Box
+  M5.Lcd.fillRect(0.605*screenWidth, 0.274*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+  
+  //2nd Box
+  M5.Lcd.fillRect(0.89*screenWidth, 0.220*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
+  M5.Lcd.fillRect(0.85*screenWidth, 0.264*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+
+  //3rd Box
+  M5.Lcd.fillRect(0.605*screenWidth, 0.749*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+  
+  //4th Box
+  M5.Lcd.fillRect(0.89*screenWidth, 0.695*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
+  M5.Lcd.fillRect(0.85*screenWidth, 0.739*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+
+  //LEFT 1 Box for hours
+  M5.Lcd.fillRect(0.285*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
+  //LEFT 2 Box for minutes
+  M5.Lcd.fillRect(0.285*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
+
+  //"BUFFER TIME" text
+
+  //Set Cursor
+  M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
+  text = "Set Time";
+  M5.Lcd.print(text);
+
+  //Hours and mins text
+  M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
+  hours = "Hours";
+  M5.Lcd.print(hours);
+
+  M5.Lcd.setCursor(0.03 * screenWidth, 0.70 * screenHeight);
+  mins = "Mins";
+  M5.Lcd.print(mins);
+
+  
+  //Hours and Mins time 
+//  M5.Lcd.setTextColor(BLACK, LIGHTGREY);
+//  M5.Lcd.setTextSize(4.8);
+  
+  hour = 1, minute =1;
+  M5.Lcd.setCursor(0.35 * screenWidth  , 0.25* screenHeight);
+  M5.Lcd.print(hour);
+
+  M5.Lcd.setCursor(0.35 * screenWidth , 0.70* screenHeight);
+  M5.Lcd.print(minute);
+}
+
+void thirdScreenlayout()
+{ 
+  //setup function
+  //M5.Lcd.setTextSize(2.4);
+  //M5.Lcd.setTextColor(WHITE, BLACK);
+  //4 boxes for setting the alarm 
+                        //Starts            Initial                 step         height
+  M5.Lcd.fillRect(0.55*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //1st Rect
+  M5.Lcd.fillRect(0.80*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //2nd Rect
+  M5.Lcd.fillRect(0.55*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //3rd Rect
+  M5.Lcd.fillRect(0.80*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //4th rect
+
+  // + and - symbols in those boxes
+
+  //1st Box
+  M5.Lcd.fillRect(0.605*screenWidth, 0.274*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+  
+  //2nd Box
+  M5.Lcd.fillRect(0.89*screenWidth, 0.220*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
+  M5.Lcd.fillRect(0.85*screenWidth, 0.264*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+
+  //3rd Box
+  M5.Lcd.fillRect(0.605*screenWidth, 0.749*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+  
+  //4th Box
+  M5.Lcd.fillRect(0.89*screenWidth, 0.695*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
+  M5.Lcd.fillRect(0.85*screenWidth, 0.739*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
+
+  //LEFT 1 Box for hours
+  M5.Lcd.fillRect(0.285*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
+  //LEFT 2 Box for minutes
+  M5.Lcd.fillRect(0.285*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
+
+  //"BUFFER TIME" text
+
+  //Set Cursor
+  M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
+  text = "Set Buffer Time";
+  M5.Lcd.print(text);
+
+  //Hours and mins text
+  M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
+  hours = "Hours";
+  M5.Lcd.print(hours);
+
+  M5.Lcd.setCursor(0.03 * screenWidth, 0.70 * screenHeight);
+  mins = "Mins";
+  M5.Lcd.print(mins);
+
+  
+  //Hours and Mins time 
+//  M5.Lcd.setTextColor(BLACK, LIGHTGREY);
+//  M5.Lcd.setTextSize(4.8);
+  
+  hour = 1, minute =1;
+  M5.Lcd.setCursor(0.35 * screenWidth  , 0.25* screenHeight);
+  M5.Lcd.print(hour);
+
+  M5.Lcd.setCursor(0.35 * screenWidth , 0.70* screenHeight);
+  M5.Lcd.print(minute);
+}
