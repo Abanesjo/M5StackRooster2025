@@ -629,7 +629,6 @@ int* randomize(int n)
 
 //  VIBRATION FEEDBACK
   void vibrate(){
-    bool touchDetected(1);
     M5.Axp.SetLDOEnable(3,true);
     delay(200);
     M5.Axp.SetLDOEnable(3,false);
