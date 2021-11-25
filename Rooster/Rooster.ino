@@ -108,7 +108,7 @@ void setup(){
   yCursor = M5.Lcd.getCursorY();  
 }
 
-void loop(){
+void loop(){  
   M5.Lcd.clear();
   progress = false;
   do
@@ -117,6 +117,7 @@ void loop(){
     if (M5.Touch.ispressed())
     {
       progress = true;
+      vibrate();
     }
   } while(!progress);
 
@@ -327,6 +328,7 @@ void secondScreenButtonSystem()
   if (isPressed({0.1*screenWidth, 0.5*screenHeight}, 0.1*screenWidth))
   {
     progress = true;
+    vibrate();
   }
   else
   {
@@ -336,6 +338,7 @@ void secondScreenButtonSystem()
     {
       if (!onButton && alarmHour > 0)
       {
+        vibrate();
         alarmHour--;
         onButton = true;
       }
@@ -347,6 +350,7 @@ void secondScreenButtonSystem()
     {
       if (!onButton && alarmHour < 24)
       {
+        vibrate();
         alarmHour++;
         onButton = true;
       }
@@ -358,6 +362,7 @@ void secondScreenButtonSystem()
     {
       if (!onButton && alarmMinute > 0)
       {
+        vibrate();
         alarmMinute -= 1;
         onButton = true;
       }
@@ -369,6 +374,7 @@ void secondScreenButtonSystem()
      {
         if (!onButton && alarmMinute < 60)
         {
+          vibrate();
           alarmMinute += 1;
           onButton = true;
         }
@@ -413,7 +419,7 @@ void secondScreenLayoutStatic()
 
   //Set Cursor
   M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
-  M5.Lcd.print("Set Alarm TIme");
+  M5.Lcd.print("Set Alarm Time");
 
   //Hours and mins text
   M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
@@ -468,7 +474,7 @@ void thirdScreenLayoutStatic()
 
   //Set Cursor
   M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
-  M5.Lcd.print("Set Alarm TIme");
+  M5.Lcd.print("Set Alarm Time");
 
   //Hours and mins text
   M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
@@ -502,6 +508,7 @@ void thirdScreenButtonSystem()
   if (isPressed({0.1*screenWidth, 0.5*screenHeight}, 0.1*screenWidth))
   {
     progress = true;
+    vibrate();
   }
   else
   {
@@ -511,6 +518,7 @@ void thirdScreenButtonSystem()
     {
       if (!onButton && bufferMinute > 0)
       {
+        vibrate();
         bufferMinute-=5;
         onButton = true;
       }
@@ -522,6 +530,7 @@ void thirdScreenButtonSystem()
     {
       if (!onButton && (bufferMinute + 5) <= min(90, alarmHour*60 + alarmMinute))
       {
+        vibrate();
         bufferMinute+=5;
         onButton = true;
       }
@@ -584,6 +593,7 @@ void alarmSystem()
           if (squares[region].trigger(goal))
           {
             goal++;
+            vibrate();
           }
 //          else
 //          {
@@ -596,6 +606,7 @@ void alarmSystem()
   }
 }
 
+// GAME
 int* randomize(int n)
 {
   int* list = new int(n+1);
@@ -615,3 +626,13 @@ int* randomize(int n)
   }
   return list;
 }
+
+//  VIBRATION FEEDBACK
+  void vibrate(){
+    bool touchDetected(1);
+    M5.Axp.SetLDOEnable(3,true);
+    delay(200);
+    M5.Axp.SetLDOEnable(3,false);
+  }
+
+  
