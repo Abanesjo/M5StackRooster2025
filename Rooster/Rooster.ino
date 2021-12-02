@@ -110,6 +110,7 @@ void setup(){
 
 void loop(){  
   M5.Lcd.clear();
+  stopVibrate();
   progress = false;
   do
   {
@@ -292,16 +293,10 @@ void countdownLayoutDynamic()
   int alarmTime = toSeconds(alarmHour, alarmMinute, 0);
   int currentTime = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
   int timeDiff = alarmTime - currentTime;
-
-  if (timeDiff <= 0)
-  {
-    progress = true;
-  }
   
   timeStrbuff = formatTime(timeDiff);
   M5.Lcd.println(timeStrbuff);
 
-  
   //TEST Movement Indicator
   if (detectMovement()){
     M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, RED);
@@ -310,6 +305,10 @@ void countdownLayoutDynamic()
     M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, GREEN);
   }
   
+  if (triggerAlarm())
+  {
+    progress = true;
+  }
 }
 
 void secondScreenButtonSystem()
@@ -474,7 +473,7 @@ void thirdScreenLayoutStatic()
 
   //Set Cursor
   M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
-  M5.Lcd.print("Set Alarm Time");
+  M5.Lcd.print("Set Uncertainty");
 
   //Hours and mins text
   M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
@@ -546,6 +545,7 @@ void alarmSystem()
   bool pass = false;
   while(!pass)
   {
+    alarmVibrate();
     int* randomList = randomize(9);
     orderedSquares squares[9];
     
@@ -568,6 +568,7 @@ void alarmSystem()
       {
         pass = true;
         progress = true;
+        stopVibrate();
         break;
       }
       
@@ -634,4 +635,56 @@ int* randomize(int n)
     M5.Axp.SetLDOEnable(3,false);
   }
 
-  
+//  ALARM VIBRATION
+  void alarmVibrate(){
+    M5.Axp.SetLDOEnable(3,true);
+ }
+
+// STOP ALARM VIBRATION
+  void stopVibrate(){
+    M5.Axp.SetLDOEnable(3,false);
+  }
+
+// TRIGGER ALARM
+bool triggerAlarm(){
+  if (trigger1() || trigger2()){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+int counter = 0;
+
+// First Trigger Option: Triggers alarm when maximum time is reached.
+bool trigger1(){
+  int maximumTime = toSeconds(alarmHour, alarmMinute, 0);
+  int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+  if (maximumTime == RTCinSecs) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+// Second Trigger Option: Triggers alarm when movement is detected 5 times, within the time range.
+bool trigger2(){
+  int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+  int maximumTime = toSeconds(alarmHour, alarmMinute, 0);
+  int uncertainty = bufferMinute*60;
+  int timeDifference = maximumTime-RTCinSecs;
+  if(timeDifference <= uncertainty){
+    if(detectMovement()){
+      counter++;
+    }
+  }
+  if(counter>=5){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
