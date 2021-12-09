@@ -143,7 +143,7 @@ void loop(){
   progress = false;
   M5.Lcd.clear();
   setTime();
-  countdownLayoutStatic();
+  countdownLayout1Static();
   do
   {
     countdownLayoutDynamic();
@@ -185,7 +185,8 @@ bool detectMovement(){
   M5.Lcd.setTextSize(3);
   M5.Lcd.setTextColor(WHITE, BLACK);
   M5.Lcd.setCursor(0.2*screenWidth, 0.8*screenHeight);
-  M5.Lcd.printf("Error: %3.02f", delta);
+//  M5.Lcd.printf("Error: %3.02f", delta);
+  Serial.println(delta);
   
   if (delta > THRESHOLD) {
     return true;
@@ -278,16 +279,36 @@ void welcomeScreen() {
   M5.Lcd.print("Touch Screen to Begin");
 }
 
-void countdownLayoutStatic(){
+void countdownLayout1Static(){
   
-  M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, LIGHTGREY);
+  M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, NAVY);
+  
+  //cancel box
+  M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, RED);
+  // cancel text
+  M5.Lcd.setCursor(0.1 * screenWidth, 0.78 * screenHeight);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setTextColor(WHITE, RED);
+  M5.Lcd.print("Cancel");
+}
+
+void countdownLayout2Static(){
+  
+  M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, NAVY);
+  //Cancel box
+  M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, RED);
+  // Cancel text
+  M5.Lcd.setCursor(0.1 * screenWidth, 0.78 * screenHeight);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.setTextColor(WHITE, RED);
+  M5.Lcd.print("Skip");
 }
 
 void countdownLayoutDynamic()
 {
   //Printing the time left
   M5.Lcd.setTextSize(5);
-  M5.Lcd.setTextColor(BLACK,LIGHTGREY);
+  M5.Lcd.setTextColor(LIGHTGREY,NAVY);
   M5.Lcd.setCursor(0.13 * screenWidth, 0.2 * screenHeight);
   M5.Rtc.GetTime(&RTCtime);
   int alarmTime = toSeconds(alarmHour, alarmMinute, 0);
@@ -427,6 +448,14 @@ void secondScreenLayoutStatic()
   M5.Lcd.setCursor(0.03 * screenWidth, 0.70 * screenHeight);
   M5.Lcd.print("Mins");
 
+  //Back button 
+  M5.Lcd.fillCircle(0.130 * screenWidth, 0.134 * screenHeight, 19, CYAN);
+  M5.Lcd.setCursor(0.096 * screenWidth, 0.118 * screenHeight);
+  M5.Lcd.setTextSize(2.8);
+  M5.Lcd.setTextColor(BLACK);
+  M5.Lcd.print("<-");
+
+  //OK Button
   M5.Lcd.fillCircle(0.1*screenWidth, 0.5*screenHeight, 0.1*screenWidth, BLUE);
   M5.Lcd.setCursor(0.03*screenWidth, 0.45*screenHeight);
   M5.Lcd.setTextSize(4.2);
@@ -478,7 +507,15 @@ void thirdScreenLayoutStatic()
   //Hours and mins text
   M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
   M5.Lcd.print("Mins");
+  
+  //Back button 
+  M5.Lcd.fillCircle(0.130 * screenWidth, 0.134 * screenHeight, 19, CYAN);
+  M5.Lcd.setCursor(0.096 * screenWidth, 0.118 * screenHeight);
+  M5.Lcd.setTextSize(2.8);
+  M5.Lcd.setTextColor(BLACK);
+  M5.Lcd.print("<-");
 
+  //OK button
   M5.Lcd.fillCircle(0.1*screenWidth, 0.5*screenHeight, 0.1*screenWidth, BLUE);
   M5.Lcd.setCursor(0.03*screenWidth, 0.45*screenHeight);
   M5.Lcd.setTextSize(4.2);
@@ -687,4 +724,3 @@ bool trigger2(){
     return false;
   }
 }
-
