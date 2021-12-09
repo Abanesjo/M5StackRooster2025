@@ -152,6 +152,14 @@ void loop(){
 
   progress = false;
   M5.Lcd.clear();
+  stopAlarmScreenStatic();
+  do
+  {
+    
+  } while (!progress);
+
+  progress = false;
+  M5.Lcd.clear();
   do
   {
     alarmSystem();
@@ -643,6 +651,17 @@ void alarmSystem()
     delete[] randomList;
   }
 }
+
+
+void stopAlarmScreenStatic()
+{
+  M5.Lcd.fillRect(0.13*screenWidth, 0.4*screenHeight, 0.75*screenWidth, 0.4 * screenHeight, RED);
+  M5.Lcd.setCursor(0.25*screenWidth, 0.55*screenHeight);
+  M5.Lcd.setTextSize(3);
+  M5.Lcd.setTextColor(WHITE);
+  M5.Lcd.print("Stop Alarm");
+}
+
 
 // GAME
 int* randomize(int n)
