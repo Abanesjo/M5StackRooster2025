@@ -123,7 +123,7 @@ void loop(){
     }
   }
   
-  if (newProgress > 0)
+  if (newProgress == 1)
   {
     M5.Lcd.clear();
     secondScreenLayoutStatic();
@@ -134,7 +134,7 @@ void loop(){
     secondScreenButtonSystem();
   }
 
-  if (newProgress > 1)
+  if (newProgress == 2)
   {
     M5.Lcd.clear();
     thirdScreenLayoutStatic();
@@ -145,7 +145,7 @@ void loop(){
     thirdScreenButtonSystem();  
   }
 
-  if (newProgress > 2)
+  if (newProgress == 3)
   {
     M5.Lcd.clear();
     setTime();
@@ -154,28 +154,40 @@ void loop(){
   while(newProgress == 3)
   {
     countdownLayoutDynamic();
+    countdownLayout1ButtonSystem();
     delay(150);
   };
 
-  if (newProgress > 3)
+  if (newProgress == 4)
+  {
+    M5.Lcd.clear();
+    countdownLayout2Static();
+  }
+  while (newProgress == 4)
+  { 
+    countdownLayoutDynamic();
+  }
+
+  if (newProgress == 5)
   {
     M5.Lcd.clear();
     stopAlarmScreenStatic();
   }
-  while (newProgress == 4)
+  while (newProgress == 5)
   {
+    stopAlarmScreenDynamic();
     if (isPressed({0.5 * screenWidth, 0.5 * screenHeight}, 80))
     {
-      newProgress = 5;
+      newProgress = 6;
       vibrate();
     }
   }
 
-  if (newProgress > 4)
+  if (newProgress == 6)
   {
     M5.Lcd.clear();
   }
-  while (newProgress == 5)
+  while (newProgress == 6)
   {
     alarmSystem();
   }
@@ -303,12 +315,13 @@ void welcomeScreen() {
 }
 
 void countdownLayout1Static(){
-  
+  //Time Display
   M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, NAVY);
   
   //cancel box
   M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, RED);
-  // cancel text
+  
+  //cancel text
   M5.Lcd.setCursor(0.1 * screenWidth, 0.78 * screenHeight);
   M5.Lcd.setTextSize(2);
   M5.Lcd.setTextColor(WHITE, RED);
@@ -316,15 +329,35 @@ void countdownLayout1Static(){
 }
 
 void countdownLayout2Static(){
-  
+  //Time Display
   M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, NAVY);
   //Cancel box
-  M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, RED);
-  // Cancel text
+  M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, BLUE);
+  //Cancel text
   M5.Lcd.setCursor(0.1 * screenWidth, 0.78 * screenHeight);
   M5.Lcd.setTextSize(2);
-  M5.Lcd.setTextColor(WHITE, RED);
+  M5.Lcd.setTextColor(WHITE, BLUE);
   M5.Lcd.print("Skip");
+}
+
+void countdownLayout1ButtonSystem()
+{
+//  M5.Lcd.fillCircle(0.07*screenWidth + 0.15*screenWidth, 0.7*screenHeight + 0.1*screenHeight, 0.15*screenWidth, GREEN);
+  if (isPressed({0.07*screenWidth + 0.15*screenWidth, 0.7*screenHeight + 0.1*screenHeight}, 0.15*screenWidth))
+  {
+    newProgress = 1;
+    vibrate();
+  }
+}
+
+void countdownLayout2ButtonSystem()
+{
+//  M5.Lcd.fillCircle(0.07*screenWidth + 0.15*screenWidth, 0.7*screenHeight + 0.1*screenHeight, 0.15*screenWidth, GREEN);
+  if (isPressed({0.07*screenWidth + 0.15*screenWidth, 0.7*screenHeight + 0.1*screenHeight}, 0.15*screenWidth))
+  {
+    newProgress = 5;
+    vibrate();
+  }
 }
 
 void countdownLayoutDynamic()
@@ -348,11 +381,13 @@ void countdownLayoutDynamic()
   else{
     M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, GREEN);
   }
-  
+  if (timeDiff < bufferMinute*60)
+  {
+    newProgress = 4;
+  }
   if (triggerAlarm())
   {
-//    progress = true;
-      newProgress = 4;
+      newProgress = 5;
   }
 }
 
@@ -565,6 +600,11 @@ void thirdScreenLayoutDynamic()
 
 void thirdScreenButtonSystem()
 {
+  if (bufferMinute > alarmHour*60 + alarmMinute)
+  {
+    bufferMinute = alarmHour*60 + alarmMinute;
+  }
+  
   if (!M5.Touch.ispressed())
   {
     onButton = false;
@@ -591,7 +631,7 @@ void thirdScreenButtonSystem()
       if (!onButton && bufferMinute > 0)
       {
         vibrate();
-        bufferMinute-=5;
+        bufferMinute-=1;
         onButton = true;
       }
     }
@@ -600,10 +640,10 @@ void thirdScreenButtonSystem()
 //    M5.Lcd.fillCircle(0.9*screenWidth, 0.275*screenHeight, 0.1*screenWidth, GREEN);
     if (isPressed({0.9*screenWidth, 0.275*screenHeight}, 0.1*screenWidth))
     {
-      if (!onButton && (bufferMinute + 5) <= min(90, alarmHour*60 + alarmMinute))
+      if (!onButton && (bufferMinute + 1) <= min(90, alarmHour*60 + alarmMinute))
       {
         vibrate();
-        bufferMinute+=5;
+        bufferMinute+=1;
         onButton = true;
       }
     }
@@ -694,6 +734,13 @@ void stopAlarmScreenStatic()
     M5.Lcd.print("  Alarm");
 }
 
+//Add Vibration (and maybe sound) sequence for alarm here
+//(This function is looped)
+void stopAlarmScreenDynamic()
+{
+  
+}
+
 
 // GAME
 int* randomize(int n)
@@ -759,6 +806,7 @@ bool trigger1(){
 
 // Second Trigger Option: Triggers alarm when movement is detected 5 times, within the time range.
 bool trigger2(){
+//  Serial.println(counter);
   int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
   int maximumTime = toSeconds(alarmHour, alarmMinute, 0);
   int uncertainty = bufferMinute*60;
