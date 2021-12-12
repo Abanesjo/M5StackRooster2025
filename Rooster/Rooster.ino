@@ -1,13 +1,13 @@
 #include <M5Core2.h>
 
-#define THRESHOLD 2
+#define THRESHOLD 5
 
 struct customPoint {
   double x;
   double y;
 };
 
-class orderedSquares {
+class orderedCircles {
 private:
   int ID;
   customPoint center;
@@ -15,7 +15,7 @@ private:
   bool stat;
 
 public:
-  orderedSquares(int ID = 0, customPoint center = {-20,-20}, double radius = 0.0)
+  orderedCircles(int ID = 0, customPoint center = {-20,-20}, double radius = 0.0)
   {
     this->ID = ID;
     this->center = center;
@@ -86,7 +86,6 @@ float yaw = 0.0f;
 RTC_TimeTypeDef RTCtime;
 
 bool onButton = false;
-bool progress = false;
 int newProgress = 0;
 
 //Alarm Time
@@ -112,7 +111,6 @@ void setup(){
 void loop(){  
   M5.Lcd.clear();
   stopVibrate();
-  progress = false;
   while (newProgress == 0)
   {
     welcomeScreen();
@@ -166,6 +164,8 @@ void loop(){
   while (newProgress == 4)
   { 
     countdownLayoutDynamic();
+    countdownLayout2ButtonSystem();
+    delay(150);
   }
 
   if (newProgress == 5)
@@ -221,7 +221,7 @@ bool detectMovement(){
   M5.Lcd.setTextColor(WHITE, BLACK);
   M5.Lcd.setCursor(-20, -20);
   M5.Lcd.printf("Error: %3.02f", delta);
-//  Serial.println(delta);
+  Serial.println(delta);
   
   if (delta > THRESHOLD) {
     return true;
@@ -266,7 +266,7 @@ bool isPressed(customPoint center, double radius) {
     }
     else {
       return true;
-  }
+    }
   }  
 }
 
@@ -404,9 +404,9 @@ void secondScreenButtonSystem()
   }
 
   //Confirmation Button: (0.1*screenWidth, 0.5*screenHeight), R = 0.1*screenWidth
+  
   if (isPressed({0.1*screenWidth, 0.5*screenHeight}, 0.1*screenWidth))
   {
-//    progress = true;
     newProgress = 2;
     vibrate();
   }
@@ -613,7 +613,6 @@ void thirdScreenButtonSystem()
   //Confirmation Button: (0.1*screenWidth, 0.5*screenHeight), R = 0.1*screenWidth
   if (isPressed({0.1*screenWidth, 0.5*screenHeight}, 0.1*screenWidth))
   {
-//    progress = true;
     newProgress = 3;
     vibrate();
   }
@@ -652,15 +651,11 @@ void thirdScreenButtonSystem()
 
 void alarmSystem()
 {
-//  M5.Lcd.setCursor(20,20);
-//  M5.Lcd.print("Alarm Triggered");
-
   bool pass = false;
   while(!pass)
   {
-//    alarmVibrate();
     int* randomList = randomize(9);
-    orderedSquares squares[9];
+    orderedCircles circles[9];
     
     for (int i = 0; i < 3; i++)
     {
@@ -670,7 +665,7 @@ void alarmSystem()
         center.x = ((double) j * 0.33 + 0.167)*screenWidth;
         center.y = ((double) i * 0.33 + 0.167)*screenHeight;
         double radius = 0.166*screenHeight;
-        squares[3*i + j] = orderedSquares(randomList[3*i + j], center, radius);
+        circles[3*i + j] = orderedCircles(randomList[3*i + j], center, radius);
       }
     }
 
@@ -680,32 +675,20 @@ void alarmSystem()
       if (goal > 9)
       {
         pass = true;
-//        progress = true;
         newProgress = 0;
-//        stopVibrate();
         break;
       }
-      
-//       M5.Lcd.setCursor(0.2*screenWidth, 0.5*screenHeight);
-//       M5.Lcd.setTextColor(WHITE, BLACK);
-//       M5.Lcd.setTextSize(4);
-//       M5.Lcd.printf("Goal: %2d", goal);
       if (M5.Touch.ispressed())
       {
         TouchPoint_t coordinate = M5.Touch.getPressPoint();
         int region = floor(coordinate.x / (screenWidth/3.0)) + 3 * floor(coordinate.y / (screenHeight/3.0));
-//        M5.Lcd.setCursor(0.2*screenWidth, 0.5*screenHeight);
-//        M5.Lcd.setTextColor(WHITE, BLACK);
-//        M5.Lcd.setTextSize(4);
-//        M5.Lcd.printf("Region: %2d", region);
-
-        if (!squares[region].getStatus())
+        if (!circles[region].getStatus())
         {
           continue;
         }
         else
         {
-          if (squares[region].trigger(goal))
+          if (circles[region].trigger(goal))
           {
             goal++;
             vibrate();
@@ -738,9 +721,8 @@ void stopAlarmScreenStatic()
 //(This function is looped)
 void stopAlarmScreenDynamic()
 {
-  
+  alarmVibrate();
 }
-
 
 // GAME
 int* randomize(int n)
@@ -764,21 +746,47 @@ int* randomize(int n)
 }
 
 //  VIBRATION FEEDBACK
-  void vibrate(){
-    M5.Axp.SetLDOEnable(3,true);
-    delay(200);
-    M5.Axp.SetLDOEnable(3,false);
-  }
+void vibrate(){
+  M5.Axp.SetLDOEnable(3,true);
+  delay(200);
+  M5.Axp.SetLDOEnable(3,false);
+}
 
 //  ALARM VIBRATION
-  void alarmVibrate(){
-    M5.Axp.SetLDOEnable(3,true);
- }
-
-// STOP ALARM VIBRATION
-  void stopVibrate(){
+int trigger = 0;
+bool toVibrate = false;
+void alarmVibrate()
+{
+  M5.Rtc.GetTime(&RTCtime);
+  int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+  if (RTCinSecs > trigger)
+  {
+    
+    if (toVibrate == false) 
+    {
+      toVibrate = true;
+      trigger = RTCinSecs + 3;
+    }
+    else
+    {
+      toVibrate = false;
+      trigger = RTCinSecs + 1;
+    }
+  }
+  if (toVibrate == true)
+  {
+     M5.Axp.SetLDOEnable(3,true);
+  }
+  else
+  {
     M5.Axp.SetLDOEnable(3,false);
   }
+}
+
+// STOP ALARM VIBRATION
+void stopVibrate(){
+  M5.Axp.SetLDOEnable(3,false);
+}
 
 // TRIGGER ALARM
 bool triggerAlarm(){
@@ -789,8 +797,6 @@ bool triggerAlarm(){
     return false;
   }
 }
-
-int counter = 0;
 
 // First Trigger Option: Triggers alarm when maximum time is reached.
 bool trigger1(){
@@ -805,15 +811,51 @@ bool trigger1(){
 }
 
 // Second Trigger Option: Triggers alarm when movement is detected 5 times, within the time range.
+int counter(0), timeGap, timer(0), baseTime;
+bool condition(int gap){
+   int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+//   Serial.println(RTCinSecs);
+   if(RTCinSecs>gap){
+      return true;
+   }
+   else{
+      return false;
+   }
+}
+
+bool resetCounter(int startPoint){
+   int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+   int timeInterval = RTCinSecs - startPoint;
+   if (timeInterval > 180){
+      return true;
+   }
+   else{
+      return false;
+   }
+}
+
 bool trigger2(){
 //  Serial.println(counter);
   int RTCinSecs = toSeconds(RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
   int maximumTime = toSeconds(alarmHour, alarmMinute, 0);
   int uncertainty = bufferMinute*60;
   int timeDifference = maximumTime-RTCinSecs;
-  if(timeDifference <= uncertainty){
-    if(detectMovement()){
-      counter++;
+  if(timeDifference<= uncertainty){
+    if (counter == 0){
+      if(detectMovement()){
+          counter++;
+          timeGap = RTCinSecs+1;
+          baseTime = RTCinSecs;
+        }
+    }
+    if(resetCounter(baseTime)){
+      counter = 0;
+    }
+    if(condition(timeGap)){
+      if (detectMovement()){
+        counter++;
+        timeGap = RTCinSecs+1;
+      }
     }
   }
   if(counter>=5){
