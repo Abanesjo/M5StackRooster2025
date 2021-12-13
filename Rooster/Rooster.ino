@@ -699,7 +699,6 @@ void alarmSystem()
     int goal = 1;
     while(true)
     {
-      alarmVibrate();
       if (goal > 9)
       {
         pass = true;
@@ -719,7 +718,7 @@ void alarmSystem()
           if (circles[region].trigger(goal))
           {
             goal++;
-//            vibrate();
+            vibrate();
           }
 //          else
 //          {
