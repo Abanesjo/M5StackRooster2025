@@ -1,7 +1,9 @@
 #include <M5Core2.h>
 #include <driver/i2s.h>
 
+//accelerometer threshold
 #define THRESHOLD 8
+//speaker pins and other necessary setup
 #define CONFIG_I2S_BCK_PIN 12 //定义I2S相关端口
 #define CONFIG_I2S_LRCK_PIN 0
 #define CONFIG_I2S_DATA_PIN 2
@@ -13,13 +15,16 @@
 #define MODE_SPK 1
 #define DATA_SIZE 1024
 
+//array for sound file in data.c 
 extern const unsigned char alarmTone[38528];
 
+//point structure that can store x and y coordinates
 struct customPoint {
   double x;
   double y;
 };
 
+//class for interactive game
 class orderedCircles {
 private:
   int ID;
@@ -60,6 +65,7 @@ public:
 
   void updateImage()
   {
+    //if stat is true, displays default image with blue circle and ID
     if (stat)
     {
       M5.Lcd.fillCircle(center.x, center.y, radius, BLUE);
@@ -68,6 +74,7 @@ public:
       M5.Lcd.setTextColor(WHITE, BLUE);
       M5.Lcd.print(ID);
     }
+    //if stat is false, overrwites same region with a black circle
     else
     {
       M5.Lcd.fillCircle(center.x, center.y, radius, BLACK);
@@ -76,6 +83,7 @@ public:
 
   bool trigger(int goal)
   {
+    //if the ID equals the goal, stat is set to false
     if (goal == ID)
     {
       stat = false;
@@ -89,9 +97,11 @@ public:
   }
 };
 
+//Global Variables
 double screenHeight,screenWidth;
 int xCursor, yCursor;
 
+//Gyro Position Variables
 float pitch = 0.0f;
 float roll = 0.0f;
 float yaw = 0.0f;
@@ -110,11 +120,14 @@ int bufferMinute = 0;
 
 String timeStrbuff;
 
+//for ringTone();
 int triggerVibrate = 0;
 bool toVibrate = false;
 
+//for alarmVibrate();
 int triggerRing = 0;
 bool toRing = false;
+
 void setup(){
   M5.begin(true, true, true, true); 
   M5.IMU.Init();
@@ -127,6 +140,7 @@ void setup(){
   SpeakInit();
 }
 
+//void loop uses control system detailed in final report
 void loop(){  
   M5.Lcd.clear();
   stopVibrate();
@@ -211,15 +225,16 @@ void loop(){
   {
     setTime();
     M5.Lcd.clear();
-    triggerVibrate = 0; 
-    toVibrate = false;
+    triggerRing = 0;
+    toRing = false;
   }
   while (newProgress == 6)
   {
-    alarmSystem();
+    gameSystem();
   }
 }
 
+//resets system time
 void setTime(){
   RTCtime.Hours = 0;
   RTCtime.Minutes = 0;
@@ -227,6 +242,7 @@ void setTime(){
   M5.Rtc.SetTime(&RTCtime);
 }
 
+//measures if position deviation is greater than threshold
 bool detectMovement(){
   bool result;
   float oldPitch = pitch;
@@ -244,6 +260,8 @@ bool detectMovement(){
   float deltaYaw = abs(newYaw - oldYaw);
   float delta = deltaPitch + deltaRoll + deltaYaw;
 
+  
+//  Unresolved bug: for some reason, removing the next 4 lines crashes the program
   M5.Lcd.setTextSize(0);
   M5.Lcd.setTextColor(WHITE, BLACK);
   M5.Lcd.setCursor(-20, -20);
@@ -258,22 +276,13 @@ bool detectMovement(){
   }
 }
 
-bool maxTimeReached(int hours, int minutes, int seconds){
-  M5.Rtc.GetTime(&RTCtime);
-  if (hours == RTCtime.Hours && minutes == RTCtime.Minutes && seconds == RTCtime.Seconds){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
 //if not declaring a customPoint object, you can use distance({x1, y1}, {x2, y2})
 double distance(customPoint p1, customPoint p2)
 {
   return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 }
 
+// touch detection function
 bool isPressed(customPoint center, double radius) {
   TouchPoint_t coordinate = M5.Touch.getPressPoint();
 //  M5.Lcd.setCursor(30, 30);
@@ -297,10 +306,12 @@ bool isPressed(customPoint center, double radius) {
   }  
 }
 
+// converts time to seconds
 int toSeconds(int hours, int minutes, int seconds) {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
+// formats time as XX:XX:XX
 String formatTime(int sec) {
   int orig = sec;
   int hours = sec/3600;
@@ -324,6 +335,7 @@ String formatTime(int sec) {
   return output;
 }
 
+//start screen
 void welcomeScreen() {
   M5.Lcd.setTextSize(5);
   M5.Lcd.setTextColor(WHITE, BLACK);
@@ -342,13 +354,13 @@ void welcomeScreen() {
 }
 
 void countdownLayout1Static(){
-  //Time Display
+//  Time Display
   M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, NAVY);
   
-  //cancel box
+//  cancel box
   M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, RED);
   
-  //cancel text
+//  cancel text
   M5.Lcd.setCursor(0.1 * screenWidth, 0.78 * screenHeight);
   M5.Lcd.setTextSize(2);
   M5.Lcd.setTextColor(WHITE, RED);
@@ -356,11 +368,11 @@ void countdownLayout1Static(){
 }
 
 void countdownLayout2Static(){
-  //Time Display
+//  Time Display
   M5.Lcd.fillRect(10, 0.125*screenHeight, screenWidth-20, 0.35 * screenHeight, NAVY);
-  //Cancel box
+//  Cancel box
   M5.Lcd.fillRect(0.07 * screenWidth, 0.7 * screenHeight, 0.30 * screenWidth, 0.20 * screenHeight, BLUE);
-  //Cancel text
+//  Cancel text
   M5.Lcd.setCursor(0.1 * screenWidth, 0.78 * screenHeight);
   M5.Lcd.setTextSize(2);
   M5.Lcd.setTextColor(WHITE, BLUE);
@@ -389,7 +401,7 @@ void countdownLayout2ButtonSystem()
 
 void countdownLayoutDynamic()
 {
-  //Printing the time left
+//  Printing the time left
   M5.Lcd.setTextSize(5);
   M5.Lcd.setTextColor(LIGHTGREY,NAVY);
   M5.Lcd.setCursor(0.13 * screenWidth, 0.2 * screenHeight);
@@ -401,7 +413,7 @@ void countdownLayoutDynamic()
   timeStrbuff = formatTime(timeDiff);
   M5.Lcd.println(timeStrbuff);
 
-  //TEST Movement Indicator
+//  TEST Movement Indicator
   if (detectMovement()){
     M5.Lcd.fillCircle(screenWidth/2, screenHeight/2+50, 10, RED);
   }
@@ -430,7 +442,7 @@ void secondScreenButtonSystem()
     onButton = false;
   }
 
-  //Confirmation Button: (0.1*screenWidth, 0.5*screenHeight), R = 0.1*screenWidth
+//  Confirmation Button: (0.1*screenWidth, 0.5*screenHeight), R = 0.1*screenWidth
   
   if (isPressed({0.1*screenWidth, 0.5*screenHeight}, 0.1*screenWidth))
   {
@@ -444,7 +456,7 @@ void secondScreenButtonSystem()
   }
   else
   {
-    //Button 1: (0.65*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
+//    Button 1: (0.65*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
 //    M5.Lcd.fillCircle(0.65*screenWidth, 0.275*screenHeight, 0.1*screenWidth, GREEN);
     if (isPressed({0.65*screenWidth, 0.275*screenHeight}, 0.1*screenWidth))
     {
@@ -456,7 +468,7 @@ void secondScreenButtonSystem()
       }
     }
   
-    //Button 2: (0.9*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
+//    Button 2: (0.9*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
 //    M5.Lcd.fillCircle(0.9*screenWidth, 0.275*screenHeight, 0.1*screenWidth, GREEN);
     if (isPressed({0.9*screenWidth, 0.275*screenHeight}, 0.1*screenWidth))
     {
@@ -468,7 +480,7 @@ void secondScreenButtonSystem()
       }
     }
 
-    //Button 3: (0.65*screenWidth, 0.75*screenHeight), R = 0.1*screenWidth
+//    Button 3: (0.65*screenWidth, 0.75*screenHeight), R = 0.1*screenWidth
 //    M5.Lcd.fillCircle(0.65*screenWidth, 0.75*screenHeight, 0.1*screenWidth, GREEN);
     if (isPressed({0.65*screenWidth, 0.75*screenHeight}, 0.1*screenWidth))
     {
@@ -480,7 +492,7 @@ void secondScreenButtonSystem()
       }
     }
   
-     //Button 4: (0.9*screenWidth, 0.75*screenHeight), R = 0.1*screenWidth
+//     Button 4: (0.9*screenWidth, 0.75*screenHeight), R = 0.1*screenWidth
 //     M5.Lcd.fillCircle(0.9*screenWidth, 0.75*screenHeight, 0.1*screenWidth, GREEN);
      if (isPressed({0.9*screenWidth, 0.75*screenHeight}, 0.1*screenWidth))
      {
@@ -496,58 +508,58 @@ void secondScreenButtonSystem()
 
 void secondScreenLayoutStatic()
 { 
-  //4 boxes for setting the alarm 
-                        //Starts            Initial                 step         height
+//  4 boxes for setting the alarm 
+//                        Starts            Initial                 step         height
   M5.Lcd.fillRect(0.55*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //1st Rect
   M5.Lcd.fillRect(0.80*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //2nd Rect
   M5.Lcd.fillRect(0.55*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //3rd Rect
   M5.Lcd.fillRect(0.80*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //4th rect
 
-  // + and - symbols in those boxes
+//   + and - symbols in those boxes
 
-  //1st Box
+//  1st Box
   M5.Lcd.fillRect(0.605*screenWidth, 0.274*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
 
-  //2nd Box
+//  2nd Box
   M5.Lcd.fillRect(0.89*screenWidth, 0.220*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
   M5.Lcd.fillRect(0.85*screenWidth, 0.264*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
 
-  //3rd Box
+//  3rd Box
   M5.Lcd.fillRect(0.605*screenWidth, 0.749*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
 
-  //4th Box
+//  4th Box
   M5.Lcd.fillRect(0.89*screenWidth, 0.695*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
   M5.Lcd.fillRect(0.85*screenWidth, 0.739*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
 
-  //LEFT 1 Box for hours
+//  LEFT 1 Box for hours
   M5.Lcd.fillRect(0.285*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
-  //LEFT 2 Box for minutes
+//  LEFT 2 Box for minutes
   M5.Lcd.fillRect(0.285*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
 
-  //"BUFFER TIME" text
+//  "BUFFER TIME" text
 
    M5.Lcd.setTextSize(2.4);
    M5.Lcd.setTextColor(WHITE, BLACK);
 
-  //Set Cursor
+//  Set Cursor
   M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
   M5.Lcd.print("Set Alarm Time");
 
-  //Hours and mins text
+//  Hours and mins text
   M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
   M5.Lcd.print("Hours");
 
   M5.Lcd.setCursor(0.03 * screenWidth, 0.70 * screenHeight);
   M5.Lcd.print("Mins");
 
-  //Back button 
+//  Back button 
   M5.Lcd.fillCircle(0.130 * screenWidth, 0.134 * screenHeight, 19, CYAN);
   M5.Lcd.setCursor(0.096 * screenWidth, 0.118 * screenHeight);
   M5.Lcd.setTextSize(2.8);
   M5.Lcd.setTextColor(BLACK);
   M5.Lcd.print("<-");
 
-  //OK Button
+//  OK Button
   M5.Lcd.fillCircle(0.1*screenWidth, 0.5*screenHeight, 0.1*screenWidth, BLUE);
   M5.Lcd.setCursor(0.03*screenWidth, 0.45*screenHeight);
   M5.Lcd.setTextSize(4.2);
@@ -557,7 +569,7 @@ void secondScreenLayoutStatic()
 
 void secondScreenLayoutDynamic()
 {
-  //Hours and Mins time 
+//  Hours and Mins time 
   M5.Lcd.setTextColor(BLACK, LIGHTGREY);
   M5.Lcd.setTextSize(4.8);
   
@@ -570,44 +582,44 @@ void secondScreenLayoutDynamic()
 
 void thirdScreenLayoutStatic()
 {
-  //2 boxes for setting the alarm 
-                        //Starts            Initial                 step         height
+//  2 boxes for setting the alarm 
+//                        Starts            Initial                 step         height
   M5.Lcd.fillRect(0.55*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //1st Rect
   M5.Lcd.fillRect(0.80*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //2nd Rect
 
-  // + and - symbols in those boxes
+//   + and - symbols in those boxes
 
-  //1st Box
+//  1st Box
   M5.Lcd.fillRect(0.605*screenWidth, 0.274*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
 
-  //2nd Box
+//  2nd Box
   M5.Lcd.fillRect(0.89*screenWidth, 0.220*screenHeight, 0.02*screenWidth, 0.12*screenHeight, BLACK);
   M5.Lcd.fillRect(0.85*screenWidth, 0.264*screenHeight, 0.09*screenWidth, 0.025*screenHeight, BLACK);
 
-  //LEFT 1 Box for minutes
+//  LEFT 1 Box for minutes
   M5.Lcd.fillRect(0.285*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, LIGHTGREY);
 
-  //"BUFFER TIME" text
+//  "BUFFER TIME" text
 
    M5.Lcd.setTextSize(2.4);
    M5.Lcd.setTextColor(WHITE, BLACK);
 
-  //Set Cursor
+//  Set Cursor
   M5.Lcd.setCursor(0.23 * screenWidth, 0.03 * screenHeight);
   M5.Lcd.print("Set Uncertainty");
 
-  //Hours and mins text
+//  Hours and mins text
   M5.Lcd.setCursor(0.03 * screenWidth, 0.25 * screenHeight);
   M5.Lcd.print("Mins");
   
-  //Back button 
+//  Back button 
   M5.Lcd.fillCircle(0.130 * screenWidth, 0.134 * screenHeight, 19, CYAN);
   M5.Lcd.setCursor(0.096 * screenWidth, 0.118 * screenHeight);
   M5.Lcd.setTextSize(2.8);
   M5.Lcd.setTextColor(BLACK);
   M5.Lcd.print("<-");
 
-  //OK button
+//  OK button
   M5.Lcd.fillCircle(0.1*screenWidth, 0.5*screenHeight, 0.1*screenWidth, BLUE);
   M5.Lcd.setCursor(0.03*screenWidth, 0.45*screenHeight);
   M5.Lcd.setTextSize(4.2);
@@ -617,7 +629,7 @@ void thirdScreenLayoutStatic()
 
 void thirdScreenLayoutDynamic()
 {
-  //Mins time
+//  Mins time
   M5.Lcd.setTextColor(BLACK, LIGHTGREY);
   M5.Lcd.setTextSize(4.8);
   
@@ -637,7 +649,7 @@ void thirdScreenButtonSystem()
     onButton = false;
   }
 
-  //Confirmation Button: (0.1*screenWidth, 0.5*screenHeight), R = 0.1*screenWidth
+//  Confirmation Button: (0.1*screenWidth, 0.5*screenHeight), R = 0.1*screenWidth
   if (isPressed({0.1*screenWidth, 0.5*screenHeight}, 0.1*screenWidth))
   {
     newProgress = 3;
@@ -650,7 +662,7 @@ void thirdScreenButtonSystem()
   }
   else
   {
-    //Button 1: (0.65*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
+//    Button 1: (0.65*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
 //    M5.Lcd.fillCircle(0.65*screenWidth, 0.275*screenHeight, 0.1*screenWidth, GREEN);
     if (isPressed({0.65*screenWidth, 0.275*screenHeight}, 0.1*screenWidth))
     {
@@ -662,7 +674,7 @@ void thirdScreenButtonSystem()
       }
     }
   
-    //Button 2: (0.9*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
+//    Button 2: (0.9*screenWidth, 0.275*screenHeight), R = 0.1*screenWidth
 //    M5.Lcd.fillCircle(0.9*screenWidth, 0.275*screenHeight, 0.1*screenWidth, GREEN);
     if (isPressed({0.9*screenWidth, 0.275*screenHeight}, 0.1*screenWidth))
     {
@@ -675,8 +687,8 @@ void thirdScreenButtonSystem()
     }
   }
 }
-
-void alarmSystem()
+// Game. Detailed explanation in the final report. 
+void gameSystem()
 {
   bool pass = false;
   while(!pass)
@@ -720,10 +732,6 @@ void alarmSystem()
             goal++;
             vibrate();
           }
-//          else
-//          {
-//            break;
-//          }
         }
       }
     }
@@ -731,7 +739,7 @@ void alarmSystem()
   }
 }
 
-
+// big red circle for the stop alarm screen .
 void stopAlarmScreenStatic()
 {
     M5.Lcd.fillCircle(0.5 * screenWidth, 0.5 * screenHeight, 80,  RED);
@@ -744,15 +752,14 @@ void stopAlarmScreenStatic()
     M5.Lcd.print("  Alarm");
 }
 
-//Add Vibration (and maybe sound) sequence for alarm here
-//(This function is looped)
+// for stop alarm screen vibrations and ringing
 void stopAlarmScreenDynamic()
 {
   alarmVibrate();
   ringTone();
 }
 
-// GAME
+// randomizer function
 int* randomize(int n)
 {
   int* list = new int(n+1);
@@ -809,6 +816,7 @@ void alarmVibrate()
   }
 }
 
+// RINGTONE
 void ringTone()
 {
   M5.Rtc.GetTime(&RTCtime);
@@ -918,6 +926,8 @@ bool trigger2(){
   }
 }
 
+//speaker setup, from example speaker file. 
+// see https://github.com/m5stack/M5Core2/tree/master/examples/Basics/speak 
 bool InitI2SSpeakOrMic(int mode){  //Init I2S.  初始化I2S
     esp_err_t err = ESP_OK;
 
@@ -951,10 +961,13 @@ bool InitI2SSpeakOrMic(int mode){  //Init I2S.  初始化I2S
     err += i2s_set_clk(Speak_I2S_NUMBER, 44100, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO); // Set the clock and bitwidth used by I2S Rx and Tx. 设置I2S RX、Tx使用的时钟和位宽
     return true;
 }
+// initializes speaker
 void SpeakInit(void){ // 初始化扬声器
   M5.Axp.SetSpkEnable(true);  //启用扬声器电源
   InitI2SSpeakOrMic(MODE_SPK);
 }
+
+//writes to speaker
 void RingAlarm(void){
   size_t bytes_written = 0;
   i2s_write(Speak_I2S_NUMBER, alarmTone, 38528, &bytes_written, portMAX_DELAY);
