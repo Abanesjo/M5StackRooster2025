@@ -4,14 +4,14 @@
 //accelerometer threshold
 #define THRESHOLD 8
 //speaker pins and other necessary setup
-#define CONFIG_I2S_BCK_PIN 12 //定义I2S相关端口
+#define CONFIG_I2S_BCK_PIN 12 
 #define CONFIG_I2S_LRCK_PIN 0
 #define CONFIG_I2S_DATA_PIN 2
 #define CONFIG_I2S_DATA_IN_PIN 34
 
-#define Speak_I2S_NUMBER I2S_NUM_0  //定义扬声器端口
+#define Speak_I2S_NUMBER I2S_NUM_0  
 
-#define MODE_MIC 0  //定义工作模式
+#define MODE_MIC 0 
 #define MODE_SPK 1
 #define DATA_SIZE 1024
 
@@ -962,8 +962,8 @@ bool InitI2SSpeakOrMic(int mode){  //Init I2S.  初始化I2S
     return true;
 }
 // initializes speaker
-void SpeakInit(void){ // 初始化扬声器
-  M5.Axp.SetSpkEnable(true);  //启用扬声器电源
+void SpeakInit(void){
+  M5.Axp.SetSpkEnable(true); 
   InitI2SSpeakOrMic(MODE_SPK);
 }
 
