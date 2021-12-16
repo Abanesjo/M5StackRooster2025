@@ -509,7 +509,7 @@ void secondScreenButtonSystem()
 void secondScreenLayoutStatic()
 { 
 //  4 boxes for setting the alarm 
-//                        Starts            Initial                 step         height
+//                    xCur           yCur                 width         height
   M5.Lcd.fillRect(0.55*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //1st Rect
   M5.Lcd.fillRect(0.80*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //2nd Rect
   M5.Lcd.fillRect(0.55*screenWidth, 0.6*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //3rd Rect
@@ -583,7 +583,7 @@ void secondScreenLayoutDynamic()
 void thirdScreenLayoutStatic()
 {
 //  2 boxes for setting the alarm 
-//                        Starts            Initial                 step         height
+//                    xCur           yCur                 width         height
   M5.Lcd.fillRect(0.55*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //1st Rect
   M5.Lcd.fillRect(0.80*screenWidth, 0.125*screenHeight, 0.2*screenWidth, 0.30 * screenHeight, OLIVE); //2nd Rect
 
