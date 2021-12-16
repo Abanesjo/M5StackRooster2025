@@ -14,6 +14,8 @@ To run this program, an M5Stack Core 2 is needed (no other peripherals required)
 
 After doing the setup above, simply download the Rooster directory which should have the source file and the sound data file. Compile it using your Arduino IDE and execute it using the core. If all goes well, that should be it and your smart alarm system should be ready! The features in the core are self-explanatory and most screens have a back button as well. 
 
+Also note that the analysis of the core's accelerometer is done through MATLAB and the relevant files are located in the MATLAB folder. 
+
 ## Challenges
 This section discusses the challenges and the corresponding solutions in the implementation of the project. Because most features have already been discussed in the previous sections, this section simply highlights some of the most troubling issues and how they were addressed. 
 
